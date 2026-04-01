@@ -1,0 +1,171 @@
+R1#show running-config
+Building configuration...
+
+Current configuration : 3096 bytes
+!
+version 15.1
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname R1
+!
+no logging console
+login block-for 120 attempts 3 within 60
+login on-failure log
+login on-success log
+!
+!
+!
+ip dhcp excluded-address 10.10.10.1 10.10.10.10
+ip dhcp excluded-address 10.10.10.65 10.10.10.70
+ip dhcp excluded-address 10.10.10.129 10.10.10.134
+!
+ip dhcp pool IT
+ network 10.10.10.0 255.255.255.192
+ default-router 10.10.10.1
+ dns-server 8.8.8.8
+ip dhcp pool SALES
+ network 10.10.10.64 255.255.255.192
+ default-router 10.10.10.65
+ dns-server 8.8.8.8
+ip dhcp pool HR
+ network 10.10.10.128 255.255.255.192
+ default-router 10.10.10.129
+ dns-server 8.8.8.8
+clock timezone EST -5
+!
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+username admin privilege 15 secret 5 $1$mERr$VKBYhX.QwhQITVHkxRjcj/
+!
+!
+license udi pid CISCO2911/K9 sn FTX1524JA2N-
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name ccna.lab
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0.10
+ encapsulation dot1Q 10
+ ip address 10.10.10.1 255.255.255.192
+ ip nat inside
+!
+interface GigabitEthernet0/0.20
+ encapsulation dot1Q 20
+ ip address 10.10.10.65 255.255.255.192
+ ip nat inside
+!
+interface GigabitEthernet0/0.30
+ encapsulation dot1Q 30
+ ip address 10.10.10.129 255.255.255.192
+ ip access-group HR_TO_IT_BLOCK in
+!
+interface GigabitEthernet0/0.99
+ description MGMT_VLAN
+ encapsulation dot1Q 99
+ ip address 10.10.99.1 255.255.255.0
+ ip nat inside
+!
+interface GigabitEthernet0/1
+ ip address 10.0.0.1 255.255.255.252
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ ip address 203.0.113.2 255.255.255.252
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 10
+ log-adjacency-changes
+ redistribute static subnets
+ passive-interface default
+ no passive-interface GigabitEthernet0/1
+ no passive-interface GigabitEthernet0/0.99
+ network 10.0.0.0 0.0.0.3 area 0
+ network 10.20.20.0 0.0.0.63 area 0
+ network 10.10.10.0 0.0.0.255 area 0
+ network 10.10.99.0 0.0.0.255 area 0
+ default-information originate
+!
+ip nat inside source list 1 interface GigabitEthernet0/2 overload
+ip classless
+ip route 0.0.0.0 0.0.0.0 203.0.113.1
+!
+ip flow-export version 9
+!
+!
+ip access-list extended sl_def_acl
+ deny tcp any any eq telnet
+ deny tcp any any eq www
+ deny tcp any any eq 22
+ permit tcp any any eq 22
+ip access-list extended HR_TO_IT_BLOCK
+ deny ip 10.10.10.128 0.0.0.63 host 10.10.10.10
+ permit ip any any
+access-list 1 permit 10.10.10.0 0.0.0.255
+access-list 1 permit 10.20.20.0 0.0.0.63
+ip access-list standard MGMT_NET
+ permit 10.10.99.0 0.0.0.255
+ deny any
+access-list 99 permit 10.10.99.0 0.0.0.255
+ip access-list standard MGMT_ONLY
+ permit 10.10.99.0 0.0.0.255
+ permit host 10.0.0.1
+!
+banner motd ^C AUTHORIZED USE ONLY ^C
+!
+!
+!
+!
+logging 10.10.10.100
+line con 0
+ logging synchronous
+ login local
+!
+line aux 0
+!
+line vty 0 4
+ access-class MGMT_ONLY in
+ logging synchronous
+ login local
+ transport input ssh
+!
+!
+ntp master 6
+!
+end

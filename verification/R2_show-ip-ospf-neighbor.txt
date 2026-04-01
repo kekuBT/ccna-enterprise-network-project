@@ -1,0 +1,4 @@
+R2#show ip ospf neighbor
+
+Neighbor ID     Pri   State           Dead Time   Address         Interface
+203.0.113.2       1   FULL/DR         00:00:37    10.0.0.1        GigabitEthernet0/0

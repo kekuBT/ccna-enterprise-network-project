@@ -1,0 +1,150 @@
+SW2#show running-config
+Building configuration...
+
+Current configuration : 2853 bytes
+!
+version 15.0
+service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname SW2
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name ccna.lab
+!
+username admin secret 5 $1$mERr$VKBYhX.QwhQITVHkxRjcj/
+!
+ip arp inspection vlan 10,20,30
+!
+ip dhcp snooping vlan 10,20,30
+no ip dhcp snooping information option
+ip dhcp snooping
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+interface FastEthernet0/1
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+ switchport access vlan 30
+ ip dhcp snooping limit rate 20
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky 0001.43C9.6840
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/4
+ switchport access vlan 30
+ ip dhcp snooping limit rate 20
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky 0001.63CE.4982
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/5
+ switchport access vlan 30
+ ip dhcp snooping limit rate 20
+ switchport mode access
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky 000C.CF96.C2AC
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+ switchport trunk allowed vlan 10,20,30,99
+ ip arp inspection trust
+ ip dhcp snooping trust
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan99
+ ip address 10.10.99.3 255.255.255.0
+!
+ip default-gateway 10.10.99.1
+!
+logging 10.10.10.100
+!
+!
+!
+ip access-list standard MGMT_ONLY
+ permit 10.10.99.0 0.0.0.255
+ deny any
+ip access-list standard MGMT_NET
+ permit 10.10.99.0 0.0.0.255
+ deny any
+line con 0
+ login local
+!
+line vty 0 4
+ access-class MGMT_ONLY in
+ login local
+ transport input ssh
+line vty 5 15
+ login
+!
+!
+!
+ntp server 10.0.0.1
+!
+end
